@@ -15,7 +15,7 @@
 </div>
 
 > [!IMPORTANT]
-> This is a student project (PFE), not production software. Use it on machines you own.
+> this is not production software. Use it on machines you own.
 
 ---
 

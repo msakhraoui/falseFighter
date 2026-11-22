@@ -6,7 +6,10 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"io/fs"
+	"log/slog"
 	"os"
+	"path/filepath"
 	"syscall"
 
 	"github.com/msakhraoui/falseFighter/internal/record"
@@ -44,4 +47,36 @@ func Snapshot(path string) (record.Record, error) {
 		MTime:  info.ModTime().Unix(),
 		Inode:  st.Ino,
 	}, nil
+}
+
+func Walk(root string) ([]record.Record, error) {
+	var records []record.Record
+	err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			if path == root {
+				return err
+			}
+			slog.Warn("skip unreadable entry", "path", path, "err", err)
+			return nil
+		}
+
+		if d.IsDir() {
+			return nil
+		}
+		if !d.Type().IsRegular() {
+			return nil
+		}
+
+		s, err := Snapshot(path)
+		if err != nil {
+			slog.Warn("skip file", "path", path, "err", err)
+			return nil
+		}
+		records = append(records, s)
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("Walk %s: %w", root, err)
+	}
+	return records, nil
 }

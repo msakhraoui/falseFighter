@@ -130,4 +130,4 @@ Feedback is welcome. [Open an issue](https://github.com/msakhraoui/falseFighter/
 
 ## License
 
-GPL-3.0. Add a `LICENSE` file to the repo root to match.
+[GPL-3.0](LICENSE)
